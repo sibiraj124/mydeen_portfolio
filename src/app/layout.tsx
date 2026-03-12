@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import CustomCursor from "@/components/CustomCursor";
+import BackgroundSpotlight from "@/components/BackgroundSpotlight";
 
 export const metadata: Metadata = {
   title: "Mydheen | Full Stack Developer",
@@ -29,6 +31,8 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <div className="noise-overlay" />
+        <BackgroundSpotlight />
+        <CustomCursor />
         {children}
       </body>
     </html>

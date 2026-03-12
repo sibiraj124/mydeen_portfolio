@@ -16,6 +16,7 @@ const config: Config = {
           700: "#0d2a52",
           600: "#1e3a6e",
         },
+        glassBlue: "#38bdf8",
         accent: {
           blue: "#0ea5e9",
           cyan: "#06b6d4",
