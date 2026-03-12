@@ -39,6 +39,7 @@ const config: Config = {
         shimmer: "shimmer 2s linear infinite",
         "spin-slow": "spin-slow 20s linear infinite",
         "border-spin": "border-spin 4s linear infinite",
+        "pulse-glow": "pulse-glow 4s ease-in-out infinite",
       },
       keyframes: {
         "glow-pulse": {
@@ -60,6 +61,16 @@ const config: Config = {
         "border-spin": {
           "0%": { "--angle": "0deg" } as Record<string, string>,
           "100%": { "--angle": "360deg" } as Record<string, string>,
+        },
+        "pulse-glow": {
+          "0%, 100%": { 
+            opacity: "0.5",
+            filter: "blur(40px)"
+          },
+          "50%": { 
+            opacity: "0.8",
+            filter: "blur(60px)"
+          }
         },
       },
     },
