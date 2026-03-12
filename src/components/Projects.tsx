@@ -1,130 +1,121 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { projects } from "@/data/portfolio";
-import { FaGithub, FaExternalLinkAlt, FaStar } from "react-icons/fa";
-import { HiCodeBracket as HiCode } from "react-icons/hi2";
-import { HiSparkles } from "react-icons/hi2";
+import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Projects() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [filter, setFilter] = useState<"all" | "featured">("all");
-
-  const filtered = filter === "featured" ? projects.filter((p) => p.featured) : projects;
+  const sectionRef = useRef<HTMLSectionElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(".project-card", { y: 60, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.12,
-          scrollTrigger: { trigger: ".projects-grid", start: "top 80%", toggleActions: "play none none reverse" }
-        });
+      // Title flies in from top
+      gsap.fromTo(
+        ".projects-title",
+        { y: -100, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".projects-title",
+            start: "top 80%",
+          },
+        }
+      );
+
+      // Project cards fly in from various angles
+      gsap.fromTo(
+        ".project-card",
+        { 
+          y: 150, 
+          opacity: 0, 
+          scale: 0.7,
+          rotation: (index) => (index % 2 === 0 ? -10 : 10)
+        },
+        {
+          y: 0,
+          opacity: 1,
+          scale: 1,
+          rotation: 0,
+          duration: 1,
+          stagger: 0.2,
+          ease: "back.out(1.4)",
+          scrollTrigger: {
+            trigger: ".projects-grid",
+            start: "top 70%",
+          },
+        }
+      );
     }, sectionRef);
+
     return () => ctx.revert();
-  }, [filter]);
+  }, []);
 
   return (
-    <section id="projects" ref={sectionRef} className="py-24 relative overflow-hidden"
-      style={{ background: "var(--bg-primary)" }}>
-      <div className="absolute top-0 left-1/2 w-96 h-64 rounded-full opacity-5 pointer-events-none"
-        style={{ background: "radial-gradient(circle, #0ea5e9, transparent)", filter: "blur(80px)", transform: "translateX(-50%)" }} />
+    <section id="projects" ref={sectionRef} className="relative min-h-screen flex items-center py-20">
+      <div className="grid-bg absolute inset-0 opacity-30" />
+      
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+        <h2 className="projects-title section-title mb-8">
+          My <span className="gradient-text">Projects</span>
+        </h2>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <p className="section-tag mb-3">// what I&apos;ve built</p>
-          <h2 className="section-heading">
-            Featured <span className="gradient-text">Projects</span>
-          </h2>
-          <div className="mt-4 w-24 h-1 mx-auto rounded-full"
-            style={{ background: "linear-gradient(90deg, #0ea5e9, #06b6d4)" }} />
-          <p className="mt-4 max-w-xl mx-auto" style={{ color: "#94a3b8" }}>
-            A selection of projects that showcase my skills and passion for building great products.
-          </p>
+        <p className="section-subtitle mb-16">
+          Some of my recent work and contributions
+        </p>
 
-          {/* Filter tabs */}
-          <div className="flex items-center justify-center gap-2 mt-8">
-            {(["all", "featured"] as const).map((f) => (
-              <button key={f} onClick={() => setFilter(f)}
-                className="px-5 py-2 rounded-full text-sm font-mono capitalize transition-all duration-300"
-                style={{
-                  background: filter === f ? "linear-gradient(135deg, #0ea5e9, #06b6d4)" : "rgba(14,165,233,0.08)",
-                  color: filter === f ? "#fff" : "#94a3b8",
-                  border: filter === f ? "none" : "1px solid rgba(14,165,233,0.2)",
-                  boxShadow: filter === f ? "0 0 20px rgba(14,165,233,0.3)" : "none",
-                }}>
-                {f === "featured" && <HiSparkles className="inline mr-1" />}
-                {f === "all" ? `All (${projects.length})` : `Featured (${projects.filter((p) => p.featured).length})`}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="projects-grid grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filtered.map((project, i) => (
-            <div key={i} className="project-card card group relative overflow-hidden flex flex-col">
-              {/* Project visual header */}
-              <div className={`h-44 flex items-center justify-center relative overflow-hidden bg-gradient-to-br ${project.gradient}`}>
-                {/* Pattern overlay */}
-                <div className="absolute inset-0 grid-bg opacity-30" />
-                {/* Project icon/emoji */}
-                <div className="relative z-10 text-center">
-                  <HiCode size={48} className="text-white opacity-80 mx-auto" />
-                  <p className="text-white/60 text-xs font-mono mt-2">{project.tech[0]}</p>
-                </div>
-                {/* Featured badge */}
-                {project.featured && (
-                  <div className="absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono"
-                    style={{ background: "rgba(0,0,0,0.5)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.3)" }}>
-                    <FaStar size={10} />
-                    Featured
-                  </div>
-                )}
-                {/* Links overlay */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-400 flex items-center justify-center gap-4">
-                  <a href={project.github} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105"
-                    style={{ background: "rgba(255,255,255,0.15)", color: "#fff", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.2)" }}>
-                    <FaGithub /> Code
-                  </a>
-                  <a href={project.live} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105"
-                    style={{ background: "rgba(14,165,233,0.8)", color: "#fff", backdropFilter: "blur(10px)" }}>
-                    <FaExternalLinkAlt size={12} /> Live
-                  </a>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-6 flex flex-col flex-1">
-                <h3 className="font-heading font-bold text-base mb-2 group-hover:text-[#0ea5e9] transition-colors duration-300"
-                  style={{ color: "#e2e8f0" }}>
+        <div className="projects-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {projects.map((project, index) => (
+            <div
+              key={index}
+              className="project-card card p-6 group"
+            >
+              <div className="mb-4">
+                <h3 className="text-xl font-bold mb-3 group-hover:text-[#00d9ff] transition-colors">
                   {project.title}
                 </h3>
-                <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: "#94a3b8" }}>
+                <p className="text-[#a0a0a0] text-sm mb-4">
                   {project.description}
                 </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {project.tech.map((t) => (
-                    <span key={t} className="px-2 py-0.5 rounded text-xs font-mono"
-                      style={{ background: "rgba(14,165,233,0.08)", color: "#06b6d4", border: "1px solid rgba(6,182,212,0.15)" }}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                {project.tech.map((tech, techIndex) => (
+                  <span
+                    key={techIndex}
+                    className="px-3 py-1 text-xs rounded-full bg-[#ffffff0d] border border-[#ffffff1a] text-[#a0a0a0]"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex gap-4 mt-auto">
+                {project.github && (
+                  <a
+                    href={project.github}
+                    className="flex items-center gap-2 text-sm text-[#00d9ff] hover:underline"
+                  >
+                    <FaGithub /> Code
+                  </a>
+                )}
+                {project.live && (
+                  <a
+                    href={project.live}
+                    className="flex items-center gap-2 text-sm text-[#00d9ff] hover:underline"
+                  >
+                    <FaExternalLinkAlt /> Live
+                  </a>
+                )}
               </div>
             </div>
           ))}
-        </div>
-
-        {/* View more */}
-        <div className="text-center mt-10">
-          <a href={`https://github.com/mydheen`} target="_blank" rel="noopener noreferrer" className="btn-outline inline-flex">
-            <FaGithub />
-            View All on GitHub
-          </a>
         </div>
       </div>
     </section>
